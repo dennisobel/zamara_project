@@ -6,6 +6,7 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
+  FlatList
 } from "react-native";
 import axios from "axios";
 
@@ -49,35 +50,36 @@ const StaffScreen = ({ navigation }) => {
       });
   };
 
-  const renderStaffData = () => {
+const renderStaffData = () => {
     return (
-      <>
-        {staffData.map((staff) => {
-          return (
-            <View style={[!showSideNav ? styles.fullWidth : null]}>
-              <Card key={staff._id}>
-                <Card.Title
-                  title={staff.staffNumber}
-                  subtitle={staff.staffName}
-                />
-                <Card.Content>
-                  <Txt variant="bodyMedium">{staff.staffEmail}</Txt>
-                  <Txt variant="bodyMedium">Dept: {staff.department}</Txt>
-                  <Txt variant="bodyMedium">Salary: {staff.salary}</Txt>
-                </Card.Content>
-                <Card.Actions>
-                  <Btn onPress={() => handleEdit(staff._id)}>Edit</Btn>
-                  <Btn onPress={() => deleteStaff(staff._id)}>Delete</Btn>
-                </Card.Actions>
-              </Card>
-              <br />
-            </View>
-          );
-        })}
-      </>
+      <FlatList
+        data={staffData}
+        keyExtractor={(staff) => staff._id}
+        style={{ width: '100%' }}
+        renderItem={({ item: staff }) => (
+          <View style={[!showSideNav ? styles.fullWidth : null]}>
+            <Card key={staff._id}>
+              <Card.Title
+                title={staff.staffNumber}
+                subtitle={staff.staffName}
+              />
+              <Card.Content>
+                <Txt variant="bodyMedium">{staff.staffEmail}</Txt>
+                <Txt variant="bodyMedium">Dept: {staff.department}</Txt>
+                <Txt variant="bodyMedium">Salary: {staff.salary}</Txt>
+              </Card.Content>
+              <Card.Actions>
+                <Btn onPress={() => handleEdit(staff._id)}>Edit</Btn>
+                <Btn onPress={() => deleteStaff(staff._id)}>Delete</Btn>
+              </Card.Actions>
+            </Card>
+            <br />
+          </View>
+        )}
+      />
     );
   };
-
+  
   const toggleDrawer = () => {
     setShowSideNav(!showSideNav);
   };

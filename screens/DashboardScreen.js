@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DrawerMenu from "../components/DrawerMenu";
+import { useNavigation } from "@react-navigation/native";
 
 const DashboardScreen = ({ route }) => {
   const {
@@ -18,6 +19,7 @@ const DashboardScreen = ({ route }) => {
     avatar,
   } = route.params;
 
+  const navigation = useNavigation();
   const [showSideNav, setShowSideNav] = useState(false);
 
   const toggleDrawer = () => {

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -18,8 +20,10 @@ const LoginScreen = ({navigation}) => {
     .then(res => res.json())
     .then(data => {
       console.log(data)
+      AsyncStorage.setItem('token', data.token);
+
       navigation.navigate('Dashboard', {
-        name: data.firstName + data.lastName,
+        name: data.firstName + " " + data.lastName,
         age: data.age,
         gender: data.gender,
         email: data.email,
@@ -29,7 +33,8 @@ const LoginScreen = ({navigation}) => {
         height: data.height,
         weight: data.weight,
         eyeColor: data.eyeColor,
-        avatar: data.image
+        avatar: data.image,
+        token: data.token
       });
     })
     .catch(error => {
@@ -41,9 +46,10 @@ const LoginScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Email"
+        placeholder="Username"
         style={styles.input}
         value={username}
+        // value="atuny0"
         onChangeText={setUsername}
       />
       <TextInput
@@ -51,6 +57,7 @@ const LoginScreen = ({navigation}) => {
         secureTextEntry={true}
         style={styles.input}
         value={password}
+        // value="9uQFF1Lh"
         onChangeText={setPassword}
       />
 

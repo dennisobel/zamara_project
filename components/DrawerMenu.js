@@ -1,40 +1,59 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import { Ionicons } from '@expo/vector-icons';
-
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DrawerMenu = ({ navigation }) => {
+  const handleSignOut = async () => {
+    // Remove token from AsyncStorage
+    try {
+      await AsyncStorage.removeItem("token");
+      // Redirect to login page
+      navigation.navigate("Login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <DrawerContentScrollView>
         <DrawerItem
           label="Home"
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("Dashboard")}
           style={styles.drawerItem}
           labelStyle={styles.drawerLabel}
-          icon={() => <Ionicons name="home-outline" style={styles.drawerIcon} />}
+          icon={() => (
+            <Ionicons name="home-outline" style={styles.drawerIcon} />
+          )}
         />
         <DrawerItem
           label="Staff"
           onPress={() => navigation.navigate("Staff")}
           style={styles.drawerItem}
           labelStyle={styles.drawerLabel}
-          icon={() => <Ionicons name="people-outline" style={styles.drawerIcon} />}
+          icon={() => (
+            <Ionicons name="people-outline" style={styles.drawerIcon} />
+          )}
         />
         <DrawerItem
           label="Continents"
           onPress={() => navigation.navigate("Continents")}
           style={styles.drawerItem}
           labelStyle={styles.drawerLabel}
-          icon={() => <Ionicons name="earth-outline" style={styles.drawerIcon} />}
+          icon={() => (
+            <Ionicons name="earth-outline" style={styles.drawerIcon} />
+          )}
         />
         <DrawerItem
           label="Sign Out"
-          onPress={() => console.log("Sign Out")}
+          onPress={handleSignOut}
           style={styles.drawerItem}
           labelStyle={styles.drawerLabel}
-          icon={() => <Ionicons name="exit-outline" style={styles.drawerIcon} />}
+          icon={() => (
+            <Ionicons name="exit-outline" style={styles.drawerIcon} />
+          )}
         />
       </DrawerContentScrollView>
     </View>

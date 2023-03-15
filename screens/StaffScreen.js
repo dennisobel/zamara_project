@@ -13,25 +13,16 @@ import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import DrawerMenu from "../components/DrawerMenu";
 import { Card, Button as Btn, Text as Txt } from "react-native-paper";
+import emailjs from "@emailjs/browser";
 
-// import nodemailer from "nodemailer";
-// import SMTPConnection from "nodemailer/lib/smtp-connection";
-// import { useRef } from "react";
+const sendEmail = (to_name,to_email,subject,message) => {
+  console.log("inside send email")
 
-const transporter = async (recipientEmail, subject, body) => {
-    try {
-      const response = await axios.post(SMTP_BUCKET_API_URL, {
-        apiKey: SMTP_BUCKET_API_KEY,
-        to: recipientEmail,
-        subject: subject,
-        text: body,
-      });
-  
-      console.log(response.data); // log the response data for debugging purposes
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  emailjs.send('dennis_obel_smtp', 'template_6hjipkr',{
+    to_name,to_email,subject,message
+  },'zHwlglQmC2EGqtfP5').then(response => console.log("email sent")).catch(err => console.error(err))
+
+}
 
 const StaffScreen = ({ navigation }) => {
   const [staffData, setStaffData] = useState([]);
@@ -46,7 +37,7 @@ const StaffScreen = ({ navigation }) => {
 
   useEffect(() => {
     axios
-      .get("https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara")
+      .get("https://crudcrud.com/api/e228407e233547a597b5ae22aafcb6e8/zamara")
       .then((response) => {
         setStaffData(response.data);
       })
@@ -79,7 +70,7 @@ const StaffScreen = ({ navigation }) => {
   
     axios
       .put(
-        `https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara/${editingStaffId}`,
+        `https://crudcrud.com/api/e228407e233547a597b5ae22aafcb6e8/zamara/${editingStaffId}`,
         data
       )
       .then((response) => {
@@ -106,6 +97,7 @@ const StaffScreen = ({ navigation }) => {
         setStaffEmail("");
         setDepartment("");
         setSalary("");
+        sendEmail(data.staffName,data.staffEmail,"Profile Notification #Edited","we are glad to inform you that your staff profile has been updated.")
       })
       .catch((error) => {
         console.log(error);
@@ -127,7 +119,7 @@ const StaffScreen = ({ navigation }) => {
 
       axios
         .post(
-          "https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara",
+          "https://crudcrud.com/api/e228407e233547a597b5ae22aafcb6e8/zamara",
           data
         )
         .then((response) => {
@@ -137,6 +129,7 @@ const StaffScreen = ({ navigation }) => {
           setStaffEmail("");
           setDepartment("");
           setSalary("");
+          sendEmail(data.staffName,data.staffEmail,"Profile Notification #Created","we are glad to inform you that your staff profile has been created.")
         })
         .catch((error) => {
           console.log(error);
@@ -147,11 +140,13 @@ const StaffScreen = ({ navigation }) => {
   const deleteStaff = (id) => {
     axios
       .delete(
-        `https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara/${id}`
+        `https://crudcrud.com/api/e228407e233547a597b5ae22aafcb6e8/zamara/${id}`
       )
       .then(() => {
         const updatedStaffData = staffData.filter((staff) => staff._id !== id);
+        const updatedRecord = staffData.find(staff => staff._id == id)
         setStaffData(updatedStaffData);
+        sendEmail(updatedRecord.staffName,updatedRecord.staffEmail,"Profile Notification #Deleted","we are sad to inform you that your staff profile has been deleted.")
       })
       .catch((error) => {
         console.log(error);

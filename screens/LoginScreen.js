@@ -18,24 +18,59 @@ const LoginScreen = ({navigation}) => {
       })
     })
     .then(res => res.json())
+    .then(user => {
+      AsyncStorage.setItem('token', user.token);
+      console.log(user);
+  
+      fetch('https://dummyjson.com/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + user.token
+        }
+      })
+      .then(res => res.json())    
     .then(data => {
       console.log(data)
-      AsyncStorage.setItem('token', data.token);
+      
+      const currentUser = data.users.find(res => res.id === user.id);
 
-      navigation.navigate('Dashboard', {
-        name: data.firstName + " " + data.lastName,
-        age: data.age,
-        gender: data.gender,
-        email: data.email,
-        phone: data.phone,
-        birthDate: data.birthDate,
-        bloodGroup: data.bloodGroup,
-        height: data.height,
-        weight: data.weight,
-        eyeColor: data.eyeColor,
-        avatar: data.image,
-        token: data.token
-      });
+      if (currentUser) {
+        navigation.navigate('Dashboard', {
+          name: currentUser.firstName + " " + currentUser.lastName,
+          age: currentUser.age,
+          gender: currentUser.gender,
+          email: currentUser.email,
+          phone: currentUser.phone,
+          birthDate: currentUser.birthDate,
+          bloodGroup: currentUser.bloodGroup,
+          height: currentUser.height,
+          weight: currentUser.weight,
+          eyeColor: currentUser.eyeColor,
+          avatar: currentUser.image,
+          token: data.token
+        });
+      } else {
+        console.log('User not found!');
+      }
+    })    .catch(error => {
+      console.log(error);
+    });
+
+      // navigation.navigate('Dashboard', {
+      //   name: data.firstName + " " + data.lastName,
+      //   age: data.age,
+      //   gender: data.gender,
+      //   email: data.email,
+      //   phone: data.phone,
+      //   birthDate: data.birthDate,
+      //   bloodGroup: data.bloodGroup,
+      //   height: data.height,
+      //   weight: data.weight,
+      //   eyeColor: data.eyeColor,
+      //   avatar: data.image,
+      //   token: data.token
+      // });
     })
     .catch(error => {
       console.log(error);

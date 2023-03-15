@@ -14,6 +14,25 @@ import { Ionicons } from "@expo/vector-icons";
 import DrawerMenu from "../components/DrawerMenu";
 import { Card, Button as Btn, Text as Txt } from "react-native-paper";
 
+// import nodemailer from "nodemailer";
+// import SMTPConnection from "nodemailer/lib/smtp-connection";
+// import { useRef } from "react";
+
+const transporter = async (recipientEmail, subject, body) => {
+    try {
+      const response = await axios.post(SMTP_BUCKET_API_URL, {
+        apiKey: SMTP_BUCKET_API_KEY,
+        to: recipientEmail,
+        subject: subject,
+        text: body,
+      });
+  
+      console.log(response.data); // log the response data for debugging purposes
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 const StaffScreen = ({ navigation }) => {
   const [staffData, setStaffData] = useState([]);
   const [staffNumber, setStaffNumber] = useState("");
@@ -35,6 +54,95 @@ const StaffScreen = ({ navigation }) => {
         console.log(error);
       });
   }, []);
+
+  const handleEdit = (id) => {
+    const staff = staffData.find((staff) => staff._id === id);
+    if (staff) {
+      setEditing(true);
+      setEditingStaffId(id);
+      setStaffNumber(staff.staffNumber);
+      setStaffName(staff.staffName);
+      setStaffEmail(staff.staffEmail);
+      setDepartment(staff.department);
+      setSalary(staff.salary);
+    }
+  };
+
+  const handleEditSubmit = () => {
+    const data = {
+      staffNumber: staffNumber,
+      staffName: staffName,
+      staffEmail: staffEmail,
+      department: department,
+      salary: salary,
+    };
+  
+    axios
+      .put(
+        `https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara/${editingStaffId}`,
+        data
+      )
+      .then((response) => {
+        const updatedStaffData = staffData.map((staff) => {
+          if (staff._id === editingStaffId) {
+            return {
+              ...staff,
+              staffNumber: data.staffNumber,
+              staffName: data.staffName,
+              staffEmail: data.staffEmail,
+              department: data.department,
+              salary: data.salary,
+            };
+          } else {
+            return staff;
+          }
+        });
+        
+        setStaffData(updatedStaffData);
+        setEditing(false);
+        setEditingStaffId(null);
+        setStaffNumber("");
+        setStaffName("");
+        setStaffEmail("");
+        setDepartment("");
+        setSalary("");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  
+
+  const submitForm = () => {
+    if (editing) {
+      handleEditSubmit();
+    } else {
+      const data = {
+        staffNumber: staffNumber,
+        staffName: staffName,
+        staffEmail: staffEmail,
+        department: department,
+        salary: salary,
+      };
+
+      axios
+        .post(
+          "https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara",
+          data
+        )
+        .then((response) => {
+          setStaffData([...staffData, response.data]);
+          setStaffNumber("");
+          setStaffName("");
+          setStaffEmail("");
+          setDepartment("");
+          setSalary("");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }; 
 
   const deleteStaff = (id) => {
     axios
@@ -84,82 +192,7 @@ const renderStaffData = () => {
     setShowSideNav(!showSideNav);
   };
 
-  const handleEdit = (id) => {
-    const staff = staffData.find((staff) => staff._id === id);
-    if (staff) {
-      setEditing(true);
-      setEditingStaffId(id);
-      setStaffNumber(staff.staffNumber);
-      setStaffName(staff.staffName);
-      setStaffEmail(staff.staffEmail);
-      setDepartment(staff.department);
-      setSalary(staff.salary);
-    }
-  };
 
-  const handleEditSubmit = () => {
-    const data = {
-      staffNumber: staffNumber,
-      staffName: staffName,
-      staffEmail: staffEmail,
-      department: department,
-      salary: salary,
-    };
-
-    axios
-      .put(
-        `https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara/${editingStaffId}`,
-        data
-      )
-      .then((response) => {
-        // const updatedStaffData = staffData.map((staff) =>
-        //   staff._id === editingStaffId ? response.data : staff
-        // );
-        // setStaffData(updatedStaffData);
-        setStaffData([...staffData, data]);
-        setEditing(false);
-        setEditingStaffId(null);
-        setStaffNumber("");
-        setStaffName("");
-        setStaffEmail("");
-        setDepartment("");
-        setSalary("");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const submitForm = () => {
-    if (editing) {
-      handleEditSubmit();
-    } else {
-      const data = {
-        staffNumber: staffNumber,
-        staffName: staffName,
-        staffEmail: staffEmail,
-        department: department,
-        salary: salary,
-      };
-
-      axios
-        .post(
-          "https://crudcrud.com/api/14bb0a814f0d4d21901d179e6c5a2e15/zamara",
-          data
-        )
-        .then((response) => {
-          setStaffData([...staffData, response.data]);
-          setStaffNumber("");
-          setStaffName("");
-          setStaffEmail("");
-          setDepartment("");
-          setSalary("");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  };
 
   return (
     <View style={styles.container}>
